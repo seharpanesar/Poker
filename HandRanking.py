@@ -1,6 +1,6 @@
-import enum
+from enum import Enum
 
-class HandRanking(enum.Enum):
+class HandRanking(Enum):
     NONE = 0
     HIGH_CARD = 1
     PAIR = 2
