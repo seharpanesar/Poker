@@ -1,0 +1,72 @@
+I want to come up with a poker simulation that runs a 6 player game of poker many times. I will not simulate
+betting or gameplay. I will only distribute the cards and observe the outcomes.
+
+With this simulation, I want to answer the following questions:
+    - How often does a high card win? A pair? etc. Do for all types of hands, and create a graph.
+    - If 1 player has a flush, how likely is it for another player to have a flush? How about with a full house?
+    - What is the best hand to start with? Is it really AA? Do all pocketed hands have a decisive advantage over non pocketed hands?
+
+
+Classes:
+    - Card
+        - Attributes:
+            - Rank
+            - Suite
+        - Functions:
+            - constructor
+
+    - Deck:
+        - Attributes:
+            - Cards: Standard 52 cards deck
+            - drawnCards: cards that have been removed from deck
+
+        - Functions:
+            - Constructor: initialize a list of 52 cards and shuffle
+            - shuffle(): shuffle the deck
+            - drawCard(): remove and return 1 card from the deck
+            - getSize(): get size of deck
+            - collect(): get drawn cards and place back into deck
+
+    - Player:
+        - Attributes:
+            - hand: 2 cards
+
+        - Functions:
+            - None
+
+    - Game:
+        - Attributes:
+            - list of six players
+            - 5 cards (common pool of cards)
+
+        - Functions:
+            - runGame(deck): distribute 2 cards to each player. draw 5 cards for common pool,
+              and call functions from util class to record outcome. return following items as tuple:
+                - Winning hand (name of ranking and 5 cards)
+                - All hands (name of ranking and 5 cards)
+
+    - Util:
+        - Attributes:
+            - None
+
+        - Functions:
+            - getHandRanking(common pool, player hand)
+                - will return the best possible 5 card poker hand given 7 cards. (returns 5 cards and the name of hand)
+            - isHighCard()
+            - isPair()
+            - isTwoPair()
+            - isThreeOfAKind()
+            - isStraight()
+            - isFlush()
+            - isFullHouse()
+            - isFourOfAKind()
+            - isStraightFlush()
+
+
+
+    - main:
+        - Attributes:
+            - None
+        - Functions:
+            - Run poker simulation x times (maybe 1000000 times) and record the data into dataframe. save dataframe as csv.
+
