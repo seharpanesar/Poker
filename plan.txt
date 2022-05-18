@@ -62,8 +62,6 @@ Classes:
             - isFourOfAKind()
             - isStraightFlush()
 
-
-
     - main:
         - Attributes:
             - None

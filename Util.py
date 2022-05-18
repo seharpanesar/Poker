@@ -1,4 +1,7 @@
 
+from HandRanking import HandRanking
+from Card import Card
+
 # playerHand is list of cards size 2, commonPool is list of cards size 5
 
 # each method returns a tuple:
@@ -45,15 +48,15 @@ def getHandRanking(playerHand, commonPool):
 def isHighCard(allCards, freq_map):
     best5cards = allCards[:5]
 
-    return (1, best5cards)
+    return (HandRanking.HIGH_CARD, best5cards)
 
 def isPair(allCards, freq_map):
     best5cards = allCards[:5]
 
     if 2 in freq_map.values():
-        return (2, best5cards)
+        return (HandRanking.PAIR, best5cards)
     else:
-        return (0, None)
+        return (HandRanking.NONE, None)
 
 def isTwoPair(allCards, freq_map):
     best5cards = allCards[:5]
@@ -63,42 +66,49 @@ def isTwoPair(allCards, freq_map):
         if freq == 2:
             countOfPairs += 1
         if countOfPairs == 2:
-            return (3, best5cards)
+            return (HandRanking.TWO_PAIR, best5cards)
 
-    return (0, None)
+    return (HandRanking.NONE, None)
 
 def isThreeOfAKind(allCards, freq_map):
     best5cards = allCards[:5]
 
     if 3 in freq_map.values():
-        return (4, best5cards)
+        return (HandRanking.THREE_OF_A_KIND, best5cards)
     else:
-        return (0, None)
+        return (HandRanking.NONE, None)
 
 def isStraight(allCards, freq_map):
-    ranks = sorted(freq_map.values)
 
-    # corner case of A,2,3,4,5
-    if 14 in freq_map.keys():
-        ranks.insert(0, 1)
+    # corner case of A,2,3,4,5: temporarily add a card A with rank of 1 todo: remove that card from all cards
+    extraCardFlag = False
 
+    for card in allCards:
+        if card.rank == 14:
+            allCards.append(Card(1, card.suite))
+            extraCardFlag = True
+            break
     valid_seq_count = 0
-    valid_seq = [ranks[0]]
+    valid_seq = [allCards[0]]
 
     # todo: find a more efficient way to determine if sequence exists in hand
-    for i in range(len(ranks)-1):
-        if (ranks[i] + 1 == ranks[i+1]):
+    for i in range(len(allCards)-1):
+        if (allCards[i].rank - 1 == allCards[i+1].rank):
             valid_seq_count += 1
-            valid_seq.append(ranks[i+1])
+            valid_seq.append(allCards[i+1])
         else:
             valid_seq_count = 0
             valid_seq.clear()
-            valid_seq.append(ranks[i+1])
+            valid_seq.append(allCards[i+1])
 
         if valid_seq_count == 4:
-            return (5, valid_seq)
+            # find and return card
+            if extraCardFlag:
+                allCards.pop()
+            valid_seq.reverse()
+            return (HandRanking.STRAIGHT, valid_seq)
 
-    return (0, None)
+    return (HandRanking.NONE, None)
 
 def isFlush(allCards, freq_map):
     suite_map = {}
@@ -113,25 +123,25 @@ def isFlush(allCards, freq_map):
         flush_suite = max(suite_map, key=suite_map.get) # get() function returns a value for a given key
         flushCards = sorted(allCards, key=lambda card: card.suite == flush_suite, reverse=True)
 
-        return (6, flushCards[:5])
+        return (HandRanking.FLUSH, flushCards[:5])
 
-    return (0, None)
+    return (HandRanking.NONE, None)
 
 def isFullHouse(allCards, freq_map):
     best5cards = allCards[:5]
 
     if 2 in freq_map.values() and 3 in freq_map.values():
-        return (7, best5cards)
+        return (HandRanking.FULL_HOUSE, best5cards)
     else:
-        return (0, None)
+        return (HandRanking.NONE, None)
 
 def isFourOfAKind(allCards, freq_map):
     best5cards = allCards[:5]
 
     if 4 in freq_map.values():
-        return (8, best5cards)
+        return (HandRanking.FOUR_OF_A_KIND, best5cards)
     else:
-        return (0, None)
+        return (HandRanking.NONE, None)
 
 def isStraightFlush(allCards, freq_map):
     # todo: memoize the results so that isFlush() and isStraight do not need to be called multiple times
@@ -140,15 +150,19 @@ def isStraightFlush(allCards, freq_map):
     (flushNum, flushCards) = isFlush(allCards, freq_map)
 
     if (straightNum > 0 and flushNum > 0):
-        return (9, straightCards)
+        return (HandRanking.STRAIGHT_FLUSH, straightCards)
+
+    return (HandRanking.NONE, None)
 
 def isRoyalFlush(allCards, freq_map):
     # todo: memoize the results so that isFlush() and isStraight do not need to be called multiple times
 
     straightFlushNum, straightFlushCards = isStraightFlush(allCards, freq_map)
 
+    if straightFlushCards == None:
+        return (HandRanking.NONE, None)
+
     # straight flush beginning with a 10 = royal flush, given cards are in order.
     if straightFlushCards[0].rank == 10:
-        return (10, straightFlushCards)
+        return (HandRanking.ROYAL_FLUSH, straightFlushCards)
 
-    return (0, straightFlushCards)

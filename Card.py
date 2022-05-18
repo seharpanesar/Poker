@@ -14,3 +14,6 @@ class Card:
 
     def __str__(self):
         return "{} of {}".format(self.rank, self.suite)
+
+    def __eq__(self, other):
+        return self.rank == other.rank and self.suite == other.suite
