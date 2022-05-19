@@ -66,6 +66,13 @@ def isTwoPair(allCards, freq_map):
         if freq == 2:
             countOfPairs += 1
         if countOfPairs == 2:
+            # is 2 pair does exist, then the 5th card of the best 5 cards should be the max of the cards NOT included in 2 pair.
+            # here is why: it is possible that there are 3 pairs in allCards. This leads to the 5th and 6th card being the low ranked pair.
+            # In the case, the 7th card could be higher in rank than the 5th card, so swap them if that is the case.
+
+            maxCard = max(allCards[4:], key= lambda card: card.rank)
+            best5cards.pop()
+            best5cards.append(maxCard)
             return (HandRanking.TWO_PAIR, best5cards)
 
     return (HandRanking.NONE, None)
@@ -79,6 +86,8 @@ def isThreeOfAKind(allCards, freq_map):
         return (HandRanking.NONE, None)
 
 def isStraight(allCards, freq_map):
+    # temporarily sort by ranking. will be sorted back to original ordering later
+    allCards.sort(key=lambda card: card.rank, reverse=True)
 
     # corner case of A,2,3,4,5: temporarily add a card A with rank of 1 todo: remove that card from all cards
     extraCardFlag = False
@@ -93,21 +102,25 @@ def isStraight(allCards, freq_map):
 
     # todo: find a more efficient way to determine if sequence exists in hand
     for i in range(len(allCards)-1):
-        if (allCards[i].rank - 1 == allCards[i+1].rank):
+        if (allCards[i].rank - 1 == allCards[i+1].rank): # valid sequence step found
             valid_seq_count += 1
             valid_seq.append(allCards[i+1])
-        else:
+        elif not (allCards[i].rank == allCards[i+1].rank): # condition is to ensure that duplicate cards (in rank) are skipped
             valid_seq_count = 0
             valid_seq.clear()
-            valid_seq.append(allCards[i+1])
+            valid_seq.append(allCards[i + 1])
 
         if valid_seq_count == 4:
             # find and return card
             if extraCardFlag:
                 allCards.pop()
             valid_seq.reverse()
+            allCards.sort(key=lambda card: card.frequency * 1000 + card.rank, reverse=True)
             return (HandRanking.STRAIGHT, valid_seq)
 
+    if extraCardFlag:
+        allCards.pop()
+    allCards.sort(key=lambda card: card.frequency * 1000 + card.rank, reverse=True)
     return (HandRanking.NONE, None)
 
 def isFlush(allCards, freq_map):
@@ -139,6 +152,13 @@ def isFourOfAKind(allCards, freq_map):
     best5cards = allCards[:5]
 
     if 4 in freq_map.values():
+        # is 4 OaK does exist, then the 5th card of the best 5 cards should be the max of the cards NOT included in 4 Of a Kind.
+        # here is why: it is possible that there is a 4 of a kind and a pair in allCards. This leads to the 5th and 6th card being the  pair.
+        # The 7th card could be higher in rank than the pair card, so swap them if that is the case.
+
+        maxCard = max(allCards[4:], key=lambda card: card.rank)
+        best5cards.pop()
+        best5cards.append(maxCard)
         return (HandRanking.FOUR_OF_A_KIND, best5cards)
     else:
         return (HandRanking.NONE, None)
@@ -165,4 +185,4 @@ def isRoyalFlush(allCards, freq_map):
     # straight flush beginning with a 10 = royal flush, given cards are in order.
     if straightFlushCards[0].rank == 10:
         return (HandRanking.ROYAL_FLUSH, straightFlushCards)
-
+    return (HandRanking.NONE, None)
