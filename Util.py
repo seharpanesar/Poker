@@ -100,7 +100,7 @@ def isStraight(allCards, freq_map):
     valid_seq_count = 0
     valid_seq = [allCards[0]]
 
-    # todo: find a more efficient way to determine if sequence exists in hand
+    # returns highest straight (if exists)
     for i in range(len(allCards)-1):
         if (allCards[i].rank - 1 == allCards[i+1].rank): # valid sequence step found
             valid_seq_count += 1
@@ -165,6 +165,7 @@ def isFourOfAKind(allCards, freq_map):
 
 def isStraightFlush(allCards, freq_map):
     # todo: memoize the results so that isFlush() and isStraight do not need to be called multiple times
+    # todo: make sure that only the straight cards are being counted for flush
 
     (straightNum, straightCards) = isStraight(allCards, freq_map)
     (flushNum, flushCards) = isFlush(allCards, freq_map)
@@ -186,3 +187,6 @@ def isRoyalFlush(allCards, freq_map):
     if straightFlushCards[0].rank == 10:
         return (HandRanking.ROYAL_FLUSH, straightFlushCards)
     return (HandRanking.NONE, None)
+
+def sumOfCards(cards):
+    return sum([card.rank for card in cards])

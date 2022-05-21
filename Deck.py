@@ -6,7 +6,7 @@ class Deck:
 
     def __init__(self):
         suites = ['s', 'd', 'h', 'c']
-        ranks = list(range(1,14))
+        ranks = list(range(2,15))
 
         self.cards = []
 
@@ -15,9 +15,6 @@ class Deck:
                 self.cards.append(Card(rank, suite))
 
         self.shuffle()
-
-        for i in self.cards:
-            print(i)
 
     def shuffle(self):
         # inplace shuffle
@@ -30,7 +27,6 @@ class Deck:
 
     def drawXCards(self, x):
         return [self.drawCard() for i in range(x)]
-
 
     def getSize(self):
         return len(self.cards)
